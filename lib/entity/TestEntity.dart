@@ -3,15 +3,15 @@ import 'package:json_annotation/json_annotation.dart';
 part 'TestEntity.g.dart';
 
 @JsonSerializable()
-class TestEntity{
+class ChatEntity{
   @JsonKey(defaultValue: "")
   String name;
   int stars;
 
-  TestEntity({
+  ChatEntity({
     required this.name,
     this.stars = 0,
   });
 
-  factory TestEntity.fromJson(Map<String, dynamic> json) => _$TestEntityFromJson(json);
+  factory ChatEntity.fromJson(Map<String, dynamic> json) => _$TestEntityFromJson(json);
 }

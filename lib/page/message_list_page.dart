@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_page/ui/message_room_page.dart';
+import 'package:flutter_boost/flutter_boost.dart';
+
+import 'message_room_page.dart';
 
 class MessageListPage extends StatelessWidget {
   static const routerName = "MessageListPage";
@@ -33,8 +37,11 @@ class _MessageRoomListState extends State<MessageRoomList> {
         return ListTile(
           title: Text("小明$i"),
           onTap: () {
-            Navigator.of(context)
-                .pushNamed(MessageRoomPage.routerName, arguments: ['id', i.toString()]);
+            log("小明$i");
+            // Navigator.of(context)
+            //     .pushNamed(MessageRoomPage.routerName, arguments: {'id', i.toString()});
+            BoostNavigator.instance.push(MessageRoomPage.routerName,
+                arguments: {'id': i.toString()});
           },
         );
       },
