@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_page/entity/session_entity.dart';
@@ -7,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/contacts.dart';
+import '../provider/session_model.dart';
 import 'message_list_page.dart';
 
 class TestMain extends StatefulWidget {
@@ -106,47 +109,54 @@ class SessionItem extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 12, top: 10, bottom: 12),
-                  child: Avatar(session.avatarUrl, true),
+                  child: Avatar(session.avatarUrl, session.unReadNum > 0),
                 ),
                 Expanded(
                     child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.ideographic,
-                            children: [
-                              Expanded(
-                                  child: Text(
-                                session.userName,
-                                style: AppStyles.nameStyle,
-                              )),
-                              Text(
-                                session.lastTimeStr,
-                                style: AppStyles.timeStyle,
+                      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.ideographic,
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                        session.userName,
+                                        style: AppStyles.nameStyle,
+                                      )),
+                                  Text(
+                                    session.lastTimeStr,
+                                    style: AppStyles.timeStyle,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          Container(
+                            padding: const EdgeInsets.only(right: 22),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              session.lastMessage,
+                              style: AppStyles.messageStyle,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                      Container(
-                        padding: const EdgeInsets.only(right: 22),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          session.lastMessage,
-                          style: AppStyles.messageStyle,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ))
+                    ))
               ],
             ),
           ),
+          onTap: (){
+            log("点击：${session.sessionId}");
+            ref.read(sessionProvider.notifier).updateSession(session.sessionId, (session) {
+              return session.copyWith(unReadNum: 0);
+            });
+            BoostNavigator.instance.push(MessageRoomPage.routerName,arguments: {"id": session.sessionId});
+          },
         ),
         if (showDivider)
           const Divider(
@@ -190,23 +200,24 @@ class Avatar extends StatelessWidget {
             ),
             top: 2,
           ),
-          Positioned(
-            child: Container(
-              width: 12,
-              height: 12,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(6)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: AppColors.col_ff2b2b,
-                        offset: Offset(0, 0),
-                        blurRadius: 2,
-                        spreadRadius: 0)
-                  ]),
-            ),
-            top: 0,
-            right: 0,
-          )
+          if (hasNewMessage)
+            Positioned(
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(6)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: AppColors.col_ff2b2b,
+                          offset: Offset(0, 0),
+                          blurRadius: 2,
+                          spreadRadius: 0)
+                    ]),
+              ),
+              top: 0,
+              right: 0,
+            )
         ],
       ),
     );

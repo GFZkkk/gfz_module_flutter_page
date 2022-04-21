@@ -1,11 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter_page/config/contacts.dart';
 import 'package:flutter_page/entity/session_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../entity/user_entity.dart';
-
-
 
 class SPUtil{
 
@@ -16,6 +16,7 @@ class SPUtil{
     if (userJson != null) {
       user = UserEntity.fromJson(userJson);
     }
+    log("SPUtil init success");
   }
 
   static storeString(String k,v) async {
@@ -42,7 +43,7 @@ class SPUtil{
       return null;
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.get(key) as Map<String, dynamic>;
+    return prefs.get(key) as Map<String, dynamic>?;
   }
 
   static String? getKey(String key){

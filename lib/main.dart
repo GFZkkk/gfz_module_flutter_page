@@ -14,7 +14,7 @@ void main() async{
 
   CustomFlutterBinding();
 
-  // await SPUtil.init();
+  await SPUtil.init();
 
   TestUtil.init();
 
