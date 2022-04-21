@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
 import 'package:flutter_page/page/message_list_page.dart';
 import 'package:flutter_page/page/message_room_page.dart';
+import 'package:flutter_page/page/test_main.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -14,6 +15,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Map<String, FlutterBoostRouteFactory> routerMap = {
+    TestMain.routerName: (settings, uniqueId) {
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (_) {
+            return const TestMain();
+          });
+    },
     MessageListPage.routerName: (settings, uniqueId) {
       return CupertinoPageRoute(
           settings: settings,
@@ -51,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       home: FlutterBoostApp(
         routeFactory,
-        initialRoute: MessageListPage.routerName,
+        initialRoute: TestMain.routerName,
       ),
     );
   }

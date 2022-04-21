@@ -1,70 +1,84 @@
-import 'dart:developer';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_page/config/contacts.dart';
+import 'package:flutter_boost/flutter_boost.dart';
+import 'package:flutter_page/entity/session_entity.dart';
+import 'package:flutter_page/page/message_room_page.dart';
+import 'package:flutter_page/utils/test_util.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../entity/session_entity.dart';
-import '../provider/session_model.dart';
-import '../utils/test_util.dart';
+import '../config/contacts.dart';
+import 'message_list_page.dart';
 
-class MessageListPage extends ConsumerWidget {
-  static const routerName = "MessageListPage";
+class TestMain extends StatefulWidget {
+  static const routerName = "TestMain";
 
-  const MessageListPage({Key? key}) : super(key: key);
+  const TestMain({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<TestMain> createState() => _TestMainState();
+}
+
+class _TestMainState extends State<TestMain> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "消息",
+          "消息Test",
           style: TextStyle(color: Color(0xff2C2E34), fontSize: 17, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
       ),
+      backgroundColor: AppColors.col_F3F3F3,
       body: const SessionList(),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.send),
         onPressed: () {
-          ref.read(sessionProvider.notifier).addMessage(TestUtil.getTestMessageEntity());
+          BoostNavigator.instance.push(MessageListPage.routerName);
         },
       ),
     );
   }
 }
 
-class SessionList extends ConsumerStatefulWidget {
+class SessionList extends StatefulWidget {
   const SessionList({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
+  State<StatefulWidget> createState() {
     return _SessionListState();
   }
 }
 
-class _SessionListState extends ConsumerState<SessionList> {
+class _SessionListState extends State<SessionList> {
   @override
   void initState() {
     super.initState();
-    ref.read(sessionProvider.notifier).loadLocalSessionList();
-    ref.read(sessionProvider.notifier).updateSessionList();
+    // ref.read(sessionProvider.notifier).loadLocalSessionList();
+    // ref.read(sessionProvider.notifier).loadLastSessionList();
   }
 
   @override
   void dispose() {
-    ref.read(sessionProvider.notifier).saveSessionList();
+    // ref.read(sessionProvider.notifier).saveSessionList();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final sessionList = ref.watch(sessionProvider);
+    final sessionList = TestUtil.testSyncAllSession();
+    final session = SessionEntity();
     return ListView(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: SessionItem(
+            session,
+            showDivider: false,
+          ),
+        ),
         for (final session in sessionList) ...[
           SessionItem(session),
         ]
@@ -92,7 +106,7 @@ class SessionItem extends ConsumerWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 12, top: 10, bottom: 12),
-                  child: Avatar(session.avatarUrl, session.unReadNum > 0),
+                  child: Avatar(session.avatarUrl, true),
                 ),
                 Expanded(
                     child: Padding(
@@ -133,12 +147,6 @@ class SessionItem extends ConsumerWidget {
               ],
             ),
           ),
-          onTap: (){
-            log("点击：${session.sessionId}");
-            ref.read(sessionProvider.notifier).updateSession(session.sessionId, (session) {
-              return session.copyWith(unReadNum: 0);
-            });
-          },
         ),
         if (showDivider)
           const Divider(
@@ -182,8 +190,7 @@ class Avatar extends StatelessWidget {
             ),
             top: 2,
           ),
-          if (hasNewMessage)
-            Positioned(
+          Positioned(
             child: Container(
               width: 12,
               height: 12,

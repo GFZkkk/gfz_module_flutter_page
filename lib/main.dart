@@ -1,18 +1,26 @@
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boost/flutter_boost.dart';
+import 'package:flutter_page/utils/sp_util.dart';
+import 'package:flutter_page/utils/test_util.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 
-void main() {
+void main() async{
+
   PageVisibilityBinding.instance
       .addGlobalObserver(AppGlobalPageVisibilityObserver());
+
   CustomFlutterBinding();
-  runApp(DevicePreview(
-    enabled: false,
-    builder: (context) => const MyApp(), // Wrap your app
-  ),);
+
+  // await SPUtil.init();
+
+  TestUtil.init();
+
+  runApp(const ProviderScope(
+      child: MyApp()
+  ));
 }
 
 class AppGlobalPageVisibilityObserver extends GlobalPageVisibilityObserver {
